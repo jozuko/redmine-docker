@@ -1,0 +1,32 @@
+redmine:
+    image: redmine:3.2
+
+    ports:
+        - "10022:22"
+        - "10180:80"
+
+    volumes:
+        - "./volumes/files/:/opt/redmine/files/"
+        - "./volumes/mysql/:/var/lib/mysql/"
+        - "./volumes/repos/:/var/opt/redmine/"
+
+    environment:
+        - REDMINE_HOST=localhost:10180
+
+# add user if you want
+#        - USER=jozuko2
+#        - USER_PASSWORD=jozuko2
+#        - ROOT_PASSWORD=rootpw
+
+# redmine smtp settngs
+        - SMTP_ENABLE=n
+#       - SMTP_METHOD=smtp
+#       - SMTP_STARTTLS=true
+#       - SMTP_HOST=smtp.gmail.com
+#       - SMTP_PORT=587
+#       - SMTP_DOMAIN=smtp.gmail.com
+#       - SMTP_AUTHENTICATION=plain
+#       - SMTP_USER=user.name@gmail.com
+#       - SMTP_PASS=gmail-password
+
+#    restart: always
