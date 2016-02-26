@@ -586,5 +586,44 @@ RUN echo '# Subversionの設定'                                            > /e
     echo '</Location>'                                                  >> /etc/httpd/conf.d/vcs.conf
 
 
+
+########################################  Supervisord  ########################################
+
+RUN wget http://peak.telecommunity.com/dist/ez_setup.py; \
+    python ez_setup.py; \
+    easy_install distribute; \
+    wget https://bootstrap.pypa.io/get-pip.py; \
+    python get-pip.py
+
+
+RUN pip install supervisor
+
+
+RUN echo '[supervisord]'                          > /etc/supervisord.conf; \
+    echo 'nodaemon=true'                         >> /etc/supervisord.conf; \
+    echo ''                                      >> /etc/supervisord.conf; \
+    echo '[program:sshd]'                        >> /etc/supervisord.conf; \
+    echo 'command=/usr/sbin/sshd -D'             >> /etc/supervisord.conf; \
+    echo ''                                      >> /etc/supervisord.conf; \
+    echo '[program:update]'                      >> /etc/supervisord.conf; \
+    echo 'command=/bin/bash /root/update.sh'     >> /etc/supervisord.conf; \
+    echo ''                                      >> /etc/supervisord.conf; \
+    echo '[program:mysqld]'                      >> /etc/supervisord.conf; \
+    echo 'command=/etc/init.d/mysqld start'      >> /etc/supervisord.conf; \
+    echo ''                                      >> /etc/supervisord.conf; \
+    echo '[program:httpd]'                       >> /etc/supervisord.conf; \
+    echo 'command=/usr/sbin/httpd -D FOREGROUND' >> /etc/supervisord.conf; \
+    echo ''                                      >> /etc/supervisord.conf; \
+    echo '[program:jenkins]'                     >> /etc/supervisord.conf; \
+    echo 'command=/etc/init.d/jenkins start'     >> /etc/supervisord.conf
+
+
+RUN git clone git://github.com/Supervisor/initscripts.git; \
+    cd initscripts/; chmod +x ./redhat*; \
+    cp redhat-init-jkoppe /etc/init.d/supervisord; \
+    cp redhat-sysconfig-jkoppe /etc/sysconfig/supervisord; \
+    chkconfig --add supervisord
+
+
 CMD ["/bin/bash"]
 
