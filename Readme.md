@@ -76,11 +76,12 @@ ports: SSHの22ポートと、Redmineの80ポートをホストOSのポートに割り当てます。
 
 volumes: redmineとmysqlのデータを保存するホストのディレクトリを指定します。
          上記の記載だと、以下のようになります。
-         | 保存されるファイル               | ホストディレクトリのパス                                         |
-         |:---------------------------------|:-----------------------------------------------------------------|
-         | Redmineのattachmentファイル      | <docker-compose.ymlがあるディレクトリ>/volumes/files/            |
-         | Redmineの情報を含むMySQLのデータ | <docker-compose.ymlがあるディレクトリ>/volumes/mysql/            |
-         | git / svnリポジトリデータ        | <docker-compose.ymlがあるディレクトリ>/volumes/repos/            |
+
+| 保存されるファイル               | ホストディレクトリのパス                                         |
+|:---------------------------------|:-----------------------------------------------------------------|
+| Redmineのattachmentファイル      | <docker-compose.ymlがあるディレクトリ>/volumes/files/            |
+| Redmineの情報を含むMySQLのデータ | <docker-compose.ymlがあるディレクトリ>/volumes/mysql/            |
+| git / svnリポジトリデータ        | <docker-compose.ymlがあるディレクトリ>/volumes/repos/            |
 
 
 ## Install
@@ -89,8 +90,7 @@ volumes: redmineとmysqlのデータを保存するホストのディレクトリを指定します。
 
 ## Licence
 
-[MIT](https://github.com/tcnksm/tool/blob/master/LICENCE)
+
 
 ## Author
 
-[tcnksm](https://github.com/tcnksm)
