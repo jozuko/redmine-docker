@@ -40,5 +40,19 @@ RUN mv /etc/localtime /etc/localtime.org; \
     echo "ZONE=\"Asia/Tokyo\"" >> /etc/sysconfig/clock; \
     echo "UTC=\"False\"" >> /etc/sysconfig/clock
 
+
+
+#######################################  ssh  ########################################
+
+# setup sshd
+RUN ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key; \
+    ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key; \
+    sed -i "s/#UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config; \
+    sed -i "s/UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config; \
+    sed -i "s/#UseDNS yes/UseDNS no/g" /etc/ssh/sshd_config
+
+# expose for sshd
+EXPOSE 22
+
 # start supervisord
 CMD ["/bin/bash"]
