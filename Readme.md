@@ -1,11 +1,11 @@
 CentOS 6.7 + redmine 3.2 + jenkins + git + svn on docker
 ====
 
-Redmie環境全部入りのイメージです。
+Redmie環境全部入りのイメージです。でもまだメンテナンス中です。（2016/02/29完成目標）
 
 ## Description
 
-### URL
+### アクセスURL
 
 Redmine：http://<host-address>:<指定ポート>/
 
