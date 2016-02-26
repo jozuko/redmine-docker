@@ -8,8 +8,11 @@ Redmie環境全部入りのイメージです。
 ### URL
 
 Redmine：http://<host-address>:<指定ポート>/
+
 Jenkins：http://<host-address>:<指定ポート>/jenkins/
+
 git    ：http://<host-address>:<指定ポート>/git/
+
 svn    ：http://<host-address>:<指定ポート>/svn/
 
 ### Redmieプラグイン一覧
@@ -50,23 +53,21 @@ docker-compose.ymlを作りましたので、それを元に使い方を説明します。
 >     environment:
 >         - REDMINE_HOST=localhost:10180
 >
-> # add user if you want
-> #        - USER=jozuko2
-> #        - USER_PASSWORD=jozuko2
-> #        - ROOT_PASSWORD=rootpw
+>         - USER=jozuko2
+>         - USER_PASSWORD=jozuko2
+>         - ROOT_PASSWORD=rootpw
 >
-> # redmine smtp settngs
 >         - SMTP_ENABLE=n
-> #       - SMTP_METHOD=smtp
-> #       - SMTP_STARTTLS=true
-> #       - SMTP_HOST=smtp.gmail.com
-> #       - SMTP_PORT=587
-> #       - SMTP_DOMAIN=smtp.gmail.com
-> #       - SMTP_AUTHENTICATION=plain
-> #       - SMTP_USER=user.name@gmail.com
-> #       - SMTP_PASS=gmail-password
+>         - SMTP_METHOD=smtp
+>         - SMTP_STARTTLS=true
+>         - SMTP_HOST=smtp.gmail.com
+>         - SMTP_PORT=587
+>         - SMTP_DOMAIN=smtp.gmail.com
+>         - SMTP_AUTHENTICATION=plain
+>         - SMTP_USER=user.name@gmail.com
+>         - SMTP_PASS=gmail-password
 >
-> #    restart: always
+>     restart: always
 
 image: 変更しないでください。
 
