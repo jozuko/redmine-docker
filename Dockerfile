@@ -248,7 +248,123 @@ RUN /etc/init.d/mysqld start; \
     RAILS_ENV=production bundle exec rake redmine:plugins:process_version_change
 
 
+
 ########################################  [setting]svn  ########################################
+
+RUN mkdir -p /etc/opt/redmine/; \
+    echo "#グループの設定"                       > /etc/opt/redmine/svnauthz; \
+    echo "[groups]"                             >> /etc/opt/redmine/svnauthz; \
+    echo "#developer=harry,sarry"               >> /etc/opt/redmine/svnauthz; \
+    echo "#observer=john,greg"                  >> /etc/opt/redmine/svnauthz; \
+    echo ""                                     >> /etc/opt/redmine/svnauthz; \
+    echo "# 全てのプロジェクトに対する共通設定" >> /etc/opt/redmine/svnauthz; \
+    echo "[/]"                                  >> /etc/opt/redmine/svnauthz; \
+    echo "admin = rw"                           >> /etc/opt/redmine/svnauthz; \
+    echo "* = rw"                               >> /etc/opt/redmine/svnauthz; \
+    echo "guest = r"                            >> /etc/opt/redmine/svnauthz; \
+    echo ""                                     >> /etc/opt/redmine/svnauthz; \
+    echo "# サンプルプロジェクトに対する設定"   >> /etc/opt/redmine/svnauthz; \
+    echo "[SampleProject:/]"                    >> /etc/opt/redmine/svnauthz; \
+    echo "guest = rw"                           >> /etc/opt/redmine/svnauthz; \
+    echo "#@developer = rw"                     >> /etc/opt/redmine/svnauthz; \
+    echo "#@observer= r"                        >> /etc/opt/redmine/svnauthz; \
+    echo ""                                     >> /etc/opt/redmine/svnauthz; \
+    echo "# 特定のパスの設定"                   >> /etc/opt/redmine/svnauthz; \
+    echo "#[SampleProject:/tags]"               >> /etc/opt/redmine/svnauthz; \
+    echo "#* = r"                               >> /etc/opt/redmine/svnauthz; \
+    echo "#admin = rw"                          >> /etc/opt/redmine/svnauthz
+
+
+
+########################################  scm設定  ########################################
+
+
+RUN mkdir -p $INSTALL_DIR/bin; \
+    mkdir -p /var/opt/redmine/git /var/opt/redmine/svn /var/opt/redmine/maven
+
+
+# scm-creator : create ${INSTALL_DIR}/config/scm.yml
+RUN echo 'production:'                                         > ${INSTALL_DIR}/config/scm.yml; \
+    echo '   auto_create: true'                               >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '   deny_delete: true'                               >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '   allow_add_local: true'                           >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '   post_create: ${INSTALL_DIR}/bin/scm-post-create' >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '   svn:'                                            >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     path: /var/opt/redmine/svn'                    >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     svnadmin: /usr/bin/svnadmin'                   >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     url: repos/svn'                                >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '   git:'                                            >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     path: /var/opt/redmine/git'                    >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     git: /usr/bin/git'                             >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     options: --bare '                              >> ${INSTALL_DIR}/config/scm.yml; \
+    echo '     url: repos/git'                                >> ${INSTALL_DIR}/config/scm.yml
+
+
+# scm-creator : create ${INSTALL_DIR}/bin/scm-post-create
+RUN echo '#!/bin/sh'                                                            > ${INSTALL_DIR}/bin/scm-post-create; \
+    echo ''                                                                    >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo 'case "$2" in'                                                        >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo ''                                                                    >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '  git)'                                                              >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    git --git-dir=$1 update-server-info'                             >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    echo "'                                                          >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '#!/bin/sh'                                                           >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '${INSTALL_DIR}/bin/sync-scm'                                         >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '" > $1/hooks/post-receive'                                           >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    chmod u+x $1/hooks/post-receive'                                 >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    mv $1/hooks/update.sample $1/hooks/update'                       >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    mv $1/hooks/post-update.sample $1/hooks/post-update'             >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    echo $1 | sed "s/.*\///" > $1/description'                       >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    git --git-dir=$1 config --bool hooks.allowunannotated true'      >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    git --git-dir=$1 config --bool receive.denyNonFastforwards true' >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    git --git-dir=$1 config --bool receive.denyDeletes true'         >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    git --git-dir=$1 config --bool core.quotepath false'             >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '  ;;'                                                                >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo ''                                                                    >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '  svn)'                                                              >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    echo "#!/bin/sh'                                                 >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '${INSTALL_DIR}/bin/sync-scm $1'                                      >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '" > $1/hooks/post-commit'                                            >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '    chmod u+x $1/hooks/post-commit'                                  >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo '  ;;'                                                                >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo ''                                                                    >> ${INSTALL_DIR}/bin/scm-post-create; \
+    echo 'esac'                                                                >> ${INSTALL_DIR}/bin/scm-post-create
+
+
+# scm-creator : create ${INSTALL_DIR}/bin/sync-scm
+RUN echo '#!/bin/sh'                                                                                                                > ${INSTALL_DIR}/bin/sync-scm; \
+    echo 'if [ "$1" != "" ]'                                                                                                       >> ${INSTALL_DIR}/bin/sync-scm; \
+    echo 'then'                                                                                                                    >> ${INSTALL_DIR}/bin/sync-scm; \
+    echo '    wget -q -O /dev/null http://localhost/sys/fetch_changesets?id=`echo $1 | sed "s/\/.*\/\([^\.]*\)\(\..*\)\?/\1/"`'    >> ${INSTALL_DIR}/bin/sync-scm; \
+    echo 'else'                                                                                                                    >> ${INSTALL_DIR}/bin/sync-scm; \
+    echo '    wget -q -O /dev/null http://localhost/sys/fetch_changesets?id=`echo $PWD | sed "s/\/.*\/\([^\.]*\)\(\..*\)\?/\1/"`'  >> ${INSTALL_DIR}/bin/sync-scm; \
+    echo 'fi'                                                                                                                      >> ${INSTALL_DIR}/bin/sync-scm
+
+
+# scm-creator : create ${INSTALL_DIR}/hooks/git/post-receive
+RUN mkdir -p ${INSTALL_DIR}/hooks/git; \
+    echo '#!/bin/sh'                    > ${INSTALL_DIR}/hooks/git/post-receive; \
+    echo ''                            >> ${INSTALL_DIR}/hooks/git/post-receive; \
+    echo '${INSTALL_DIR}/bin/sync-scm' >> ${INSTALL_DIR}/hooks/git/post-receive
+
+
+# scm-creator : create ${INSTALL_DIR}/hooks/svn/post-commit
+RUN mkdir -p ${INSTALL_DIR}/hooks/svn; \
+    echo '#!/bin/sh'                          > ${INSTALL_DIR}/hooks/svn/post-commit; \
+    echo ''                                  >> ${INSTALL_DIR}/hooks/svn/post-commit; \
+    echo '/opt/redmine/bin/alm-sync-scm $@'  >> ${INSTALL_DIR}/hooks/svn/post-commit
+
+
+
+########################################  [setting]apache  ########################################
+
+ENV APACHE_USER=apache
+RUN chown -R $APACHE_USER:$APACHE_USER $INSTALL_DIR; \
+    chown -R $APACHE_USER:$APACHE_USER /var/opt/redmine
+
+
+
+##########################################  jenkins  ########################################
 
 
 CMD ["/bin/bash"]
