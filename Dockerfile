@@ -54,5 +54,13 @@ RUN ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key; \
 # expose for sshd
 EXPOSE 22
 
+
+
+####################################### EPEL #######################################
+
+RUN yum -y install epel-release; \
+    sed -i "s/enabled=1/enabled=0/g" /etc/yum.repos.d/epel.repo; \
+    yum -y --enablerepo=epel install libmcrypt-devel
+
 # start supervisord
 CMD ["/bin/bash"]
