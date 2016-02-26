@@ -1,5 +1,5 @@
 redmine:
-    image: redmine:3.2
+    image: jozuko/redmine-docker:redmine3.2
 
     ports:
         - "10022:22"
