@@ -366,6 +366,127 @@ RUN chown -R $APACHE_USER:$APACHE_USER $INSTALL_DIR; \
 
 ##########################################  jenkins  ########################################
 
+# install jenkins
+RUN wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo; \
+    rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key; \
+    yum install -y java-1.8.0-openjdk; \
+    yum install -y jenkins
+
+
+# mod_auth_mysql-3.0.0-11.el6_0.1.src.rpm for redmine
+RUN rpm -vi --force http://vault.centos.org/6.7/os/Source/SPackages/mod_auth_mysql-3.0.0-11.el6_0.1.src.rpm; \
+    cd /root/rpmbuild/SOURCES; \
+    wget http://www.redmine.org/attachments/download/6443/mod_auth_mysql-3.0.0-redmine.patch; \
+    sed -i -e "s/Release: 11%{?dist}.1/Release: 11%{?dist}.1.redmine/g" /root/rpmbuild/SPECS/mod_auth_mysql.spec; \
+    sed -i -e "s/Patch10: mod_auth_mysql-3\.0\.0-CVE-2008-2384\.patch/Patch10: mod_auth_mysql-3\.0\.0-CVE-2008-2384\.patch\nPatch20: mod_auth_mysql-3\.0\.0-redmine\.patch/g" /root/rpmbuild/SPECS/mod_auth_mysql.spec; \
+    sed -i -e "s/%patch10 -p1 -b \.cve2384/%patch10 -p1 -b \.cve2384\n%patch20 -p1/g" /root/rpmbuild/SPECS/mod_auth_mysql.spec; \
+    rpmbuild -bb /root/rpmbuild/SPECS/mod_auth_mysql.spec; \
+    rpm -vi --force /root/rpmbuild/RPMS/x86_64/mod_auth_mysql-3.0.0-11.el6.1.redmine.x86_64.rpm
+
+
+# create httpd-conf
+RUN echo '<Location /jenkins>'                                        > /etc/httpd/conf.d/jenkins.conf; \
+    echo '  Order allow,deny'                                        >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  Allow from all'                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo ''                                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  BrowserMatch "MSIE" AuthDigestEnableQueryStringHack=On'  >> /etc/httpd/conf.d/jenkins.conf; \
+    echo ''                                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  ProxyPass        http://127.0.0.1:8080/jenkins'          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  ProxyPassReverse http://127.0.0.1:8080/jenkins'          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo ''                                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  RewriteEngine On'                                        >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  RewriteCond %{LA-U:REMOTE_USER} (.+)'                    >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  RewriteRule . - [E=RU:%1,NS]'                            >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  RequestHeader set X-Forwarded-User %{RU}e'               >> /etc/httpd/conf.d/jenkins.conf; \
+    echo ''                                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLNoPasswd      Off'                              >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMYSQLEnable        On'                               >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLHost          localhost'                        >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLDB            redmine'                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLUser          redmine'                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLPassword      redmine'                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLUserTable     users'                            >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLNameField     login'                            >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLPasswordField hashed_password'                  >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLPwEncryption  sha1-rm'                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLSaltField     salt'                             >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthMySQLGroupField    groups'                           >> /etc/httpd/conf.d/jenkins.conf; \
+    echo ''                                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthName "Redmine User"'                                 >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  AuthType Basic'                                          >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '  require  valid-user'                                     >> /etc/httpd/conf.d/jenkins.conf; \
+    echo '</Location>'                                               >> /etc/httpd/conf.d/jenkins.conf
+
+
+# edit sysconfig
+RUN sed -i 's/JENKINS_ARGS=""/JENKINS_ARGS="--prefix=\/jenkins"/' /etc/sysconfig/jenkins
+
+
+# get jenkins plugin-list
+RUN mkdir -p /var/lib/jenkins/plugins; \
+    chown jenkins.jenkins /var/lib/jenkins/plugins; \
+    service jenkins start; \
+    sleep 30; \
+    wget -O $INSTALL_DIR/bin/jenkins-cli.jar http://localhost:8080/jenkins/jnlpJars/jenkins-cli.jar; \
+    curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack; \
+    java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ install-plugin reverse-proxy-auth-plugin; \
+    java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ install-plugin git; \
+    java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ install-plugin redmine; \
+    java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ install-plugin dashboard-view; \
+    mkdir -p /var/lib/jenkins; \
+    echo '<?xml version="1.0" encoding="UTF-8"?>'                                                                                           > /var/lib/jenkins/config.xml; \
+    echo '<hudson>'                                                                                                                        >> /var/lib/jenkins/config.xml; \
+    echo '  <disabledAdministrativeMonitors>'                                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '    <string>hudson.diagnosis.ReverseProxySetupMonitor</string>'                                                                  >> /var/lib/jenkins/config.xml; \
+    echo '  </disabledAdministrativeMonitors>'                                                                                             >> /var/lib/jenkins/config.xml; \
+    echo '  <version>1.0</version>'                                                                                                        >> /var/lib/jenkins/config.xml; \
+    echo '  <numExecutors>2</numExecutors>'                                                                                                >> /var/lib/jenkins/config.xml; \
+    echo '  <mode>NORMAL</mode>'                                                                                                           >> /var/lib/jenkins/config.xml; \
+    echo '  <useSecurity>true</useSecurity>'                                                                                               >> /var/lib/jenkins/config.xml; \
+    echo '  <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>'                                              >> /var/lib/jenkins/config.xml; \
+    echo '  <!-- <securityRealm class="org.jenkinsci.plugins.reverse_proxy_auth.ReverseProxySecurityRealm" plugin="reverse-proxy-auth-plugin">' >> /var/lib/jenkins/config.xml; \
+    echo '    <proxyTemplate/>'                                                                                                            >> /var/lib/jenkins/config.xml; \
+    echo '    <authContext/>'                                                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '    <inhibitInferRootDN>false</inhibitInferRootDN>'                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '    <userSearchBase></userSearchBase>'                                                                                           >> /var/lib/jenkins/config.xml; \
+    echo '    <userSearch>uid={0}</userSearch>'                                                                                            >> /var/lib/jenkins/config.xml; \
+    echo '    <authorities/>'                                                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '    <forwardedUser>X-Forwarded-User</forwardedUser>'                                                                             >> /var/lib/jenkins/config.xml; \
+    echo '    <headerGroups>X-Forwarded-Groups</headerGroups>'                                                                             >> /var/lib/jenkins/config.xml; \
+    echo '    <headerGroupsDelimiter>|</headerGroupsDelimiter>'                                                                            >> /var/lib/jenkins/config.xml; \
+    echo '  </securityRealm> -->'                                                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '  <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>'                             >> /var/lib/jenkins/config.xml; \
+    echo '  <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>'                                                                        >> /var/lib/jenkins/config.xml; \
+    echo '  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>'                                                                                 >> /var/lib/jenkins/config.xml; \
+    echo '  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter">'                                                                >> /var/lib/jenkins/config.xml; \
+    echo '    <disableSyntaxHighlighting>false</disableSyntaxHighlighting>'                                                                >> /var/lib/jenkins/config.xml; \
+    echo '  </markupFormatter>'                                                                                                            >> /var/lib/jenkins/config.xml; \
+    echo '  <jdks/>'                                                                                                                       >> /var/lib/jenkins/config.xml; \
+    echo '  <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>'                                                                        >> /var/lib/jenkins/config.xml; \
+    echo '  <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>'                                                                    >> /var/lib/jenkins/config.xml; \
+    echo '  <clouds/>'                                                                                                                     >> /var/lib/jenkins/config.xml; \
+    echo '  <slaves/>'                                                                                                                     >> /var/lib/jenkins/config.xml; \
+    echo '  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>'                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '  <views>'                                                                                                                       >> /var/lib/jenkins/config.xml; \
+    echo '    <hudson.model.AllView>'                                                                                                      >> /var/lib/jenkins/config.xml; \
+    echo '      <owner class="hudson" reference="../../.."/>'                                                                              >> /var/lib/jenkins/config.xml; \
+    echo '      <name>すべて</name>'                                                                                                       >> /var/lib/jenkins/config.xml; \
+    echo '      <filterExecutors>false</filterExecutors>'                                                                                  >> /var/lib/jenkins/config.xml; \
+    echo '      <filterQueue>false</filterQueue>'                                                                                          >> /var/lib/jenkins/config.xml; \
+    echo '      <properties class="hudson.model.View$PropertyList"/>'                                                                      >> /var/lib/jenkins/config.xml; \
+    echo '    </hudson.model.AllView>'                                                                                                     >> /var/lib/jenkins/config.xml; \
+    echo '  </views>'                                                                                                                      >> /var/lib/jenkins/config.xml; \
+    echo '  <primaryView>すべて</primaryView>'                                                                                             >> /var/lib/jenkins/config.xml; \
+    echo '  <slaveAgentPort>0</slaveAgentPort>'                                                                                            >> /var/lib/jenkins/config.xml; \
+    echo '  <label></label>'                                                                                                               >> /var/lib/jenkins/config.xml; \
+    echo '  <nodeProperties/>'                                                                                                             >> /var/lib/jenkins/config.xml; \
+    echo '  <globalNodeProperties/>'                                                                                                       >> /var/lib/jenkins/config.xml; \
+    echo '</hudson>'                                                                                                                       >> /var/lib/jenkins/config.xml; \
+    java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ restart
+
+
+########################################  after-setting  ########################################
+
 
 CMD ["/bin/bash"]
 
