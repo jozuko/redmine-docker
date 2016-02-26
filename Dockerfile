@@ -62,5 +62,46 @@ RUN yum -y install epel-release; \
     sed -i "s/enabled=1/enabled=0/g" /etc/yum.repos.d/epel.repo; \
     yum -y --enablerepo=epel install libmcrypt-devel
 
+
+
+#######################################  pre-install  ########################################
+
+RUN yum -y groupinstall "Development Tools"; \
+    yum -y --nogpgcheck install mysql \
+                                mysql-server \
+                                mysql-devel \
+                                ImageMagick \
+                                ImageMagick-devel \
+                                ipa-pgothic-fonts \
+                                httpd \
+                                httpd-devel \
+                                apr-devel \
+                                openssl-devel \
+                                curl-devel \
+                                zlib-devel \
+                                mod_auth_mysql \
+                                mod_dav_svn \
+                                mod_wsgi  \
+                                mod_perl \
+                                perl-Apache-DBI \
+                                perl-Digest-SHA \
+                                libical \
+                                python-docutils \
+                                rpmdevtools \
+                                readline-devel \
+                                ncurses-devel \
+                                gdbm-devel \
+                                tcl-devel \
+                                db4-devel \
+                                libyaml-devel \
+                                glibc-devel \
+                                libxml2-devel \
+                                libxslt-devel \
+                                sqlite-devel \
+                                libffi-devel
+RUN chkconfig --add mysqld; \
+    chkconfig mysqld on; \
+    service mysqld start
+
 # start supervisord
 CMD ["/bin/bash"]
