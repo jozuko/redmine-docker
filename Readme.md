@@ -1,43 +1,43 @@
 CentOS 6.7 + redmine 3.2 + jenkins + git + svn on docker
 ====
 
-Redmie���S������̃C���[�W�ł��B�ł��܂������e�i���X���ł��B�i2016/02/29�����ڕW�j
+Redmie環境全部入りのイメージです。でもまだメンテナンス中です。（2016/02/29完成目標）
 
 ## Description
 
-### �A�N�Z�XURL
+### アクセスURL
 
-Redmine�Fhttp://<host-address>:<�w��|�[�g>/
+Redmine：http://<host-address>:<指定ポート>/
 
-Jenkins�Fhttp://<host-address>:<�w��|�[�g>/jenkins/
+Jenkins：http://<host-address>:<指定ポート>/jenkins/
 
-git    �Fhttp://<host-address>:<�w��|�[�g>/git/
+git    ：http://<host-address>:<指定ポート>/git/
 
-svn    �Fhttp://<host-address>:<�w��|�[�g>/svn/
+svn    ：http://<host-address>:<指定ポート>/svn/
 
-### Redmie�v���O�C���ꗗ
+### Redmieプラグイン一覧
 
-| �v���O�C��                     | �T�v                                                             |
+| プラグイン                     | 概要                                                             |
 |:-------------------------------|:-----------------------------------------------------------------|
-| redmine_xls_export             | �`�P�b�g��Excel�ɃG�N�X�|�[�g                                    |
-| redmine_plugin_views_revisions | redmine_xls_export�ɕK�v��plugin                                 |
-| redmine_code_review            | ���|�W�g����diff�ɑ΂��ăR�����g��������R�[�h���r���[�v���O�C�� |
-| advanced_roadmap               | ���[�h�}�b�v��\������v���O�C��                                 |
-| scm-creator                    | Redmine��Ń����[�g���|�W�g�����쐬����v���O�C��                |
-| redmine_drafts                 | �쐬���̃`�P�b�g��ۑ�                                           |
-| clipboard_image_paste          | �`�P�b�g�ɃC���[�W���R�s�y�ł���                                 |
-| redmine_banner                 | Redmine�T�C�g�㕔�ɊǗ��҂���̃��b�Z�[�W��\���ł���            |
+| redmine_xls_export             | チケットをExcelにエクスポート                                    |
+| redmine_plugin_views_revisions | redmine_xls_exportに必要なplugin                                 |
+| redmine_code_review            | リポジトリのdiffに対してコメントを書けるコードレビュープラグイン |
+| advanced_roadmap               | ロードマップを表示するプラグイン                                 |
+| scm-creator                    | Redmine上でリモートリポジトリを作成するプラグイン                |
+| redmine_drafts                 | 作成中のチケットを保存                                           |
+| clipboard_image_paste          | チケットにイメージをコピペできる                                 |
+| redmine_banner                 | Redmineサイト上部に管理者からのメッセージを表示できる            |
 
 ## Demo
 
 ## Usage
 
-docker-compose.yml�����܂����̂ŁA��������Ɏg������������܂��B
+docker-compose.ymlを作りましたので、それを元に使い方を説明します。
 
-1. Redmine�̃R���e�i���쐬����f�B���N�g���ŁAhttps://github.com/jozuko/redmine-docker.git ��clone���܂��B
+1. Redmineのコンテナを作成するディレクトリで、https://github.com/jozuko/redmine-docker.git をcloneします。
 > git clone https://github.com/jozuko/redmine-docker.git
 
-2. redmine-docker��docker-compose.yml���܂܂�Ă��܂��̂ŁA�����̊��ɍ��킹�ĕҏW���܂��B
+2. redmine-dockerにdocker-compose.ymlが含まれていますので、自分の環境に合わせて編集します。
 > redmine:
 >     image: jozuko/redmine-docker:redmine3.2
 >
@@ -51,11 +51,11 @@ docker-compose.yml�����܂����̂ŁA��������Ɏg������������܂��B
 >         - "./volumes/repos/:/var/opt/redmine/"
 >
 >     environment:
->         - REDMINE_HOST=localhost:10180
->
 >         - USER=jozuko2
 >         - USER_PASSWORD=jozuko2
 >         - ROOT_PASSWORD=rootpw
+
+>         - REDMINE_HOST=localhost:10180
 >
 >         - SMTP_ENABLE=n
 >         - SMTP_METHOD=smtp
@@ -69,24 +69,44 @@ docker-compose.yml�����܂����̂ŁA��������Ɏg������������܂��B
 >
 >     restart: always
 
-image: �ύX���Ȃ��ł��������B
+image: 変更しないでください。
 
-ports: SSH��22�|�[�g�ƁARedmine��80�|�[�g���z�X�gOS�̃|�[�g�Ɋ��蓖�Ă܂��B
-       ��L�̋L�ڂ��ƁAhttp://<host-address>:10180/��redmine���N�����܂��B
+ports: SSHの22ポートと、Redmineの80ポートをホストOSのポートに割り当てます。
+       上記の記載だと、http://<host-address>:10180/でredmineが起動します。
 
-volumes: redmine��mysql�̃f�[�^��ۑ�����z�X�g�̃f�B���N�g�����w�肵�܂��B
-         ��L�̋L�ڂ��ƁA�ȉ��̂悤�ɂȂ�܂��B
+volumes: redmineとmysqlのデータを保存するホストのディレクトリを指定します。
+         上記の記載だと、以下のようになります。
 
-| �ۑ������t�@�C��               | �z�X�g�f�B���N�g���̃p�X                                         |
+| 保存されるファイル               | ホストディレクトリのパス                                         |
 |:---------------------------------|:-----------------------------------------------------------------|
-| Redmine��attachment�t�@�C��      | <docker-compose.yml������f�B���N�g��>/volumes/files/            |
-| Redmine�̏����܂�MySQL�̃f�[�^ | <docker-compose.yml������f�B���N�g��>/volumes/mysql/            |
-| git / svn���|�W�g���f�[�^        | <docker-compose.yml������f�B���N�g��>/volumes/repos/            |
+| Redmineのattachmentファイル      | <docker-compose.ymlがあるディレクトリ>/volumes/files/            |
+| Redmineの情報を含むMySQLのデータ | <docker-compose.ymlがあるディレクトリ>/volumes/mysql/            |
+| git / svnリポジトリデータ        | <docker-compose.ymlがあるディレクトリ>/volumes/repos/            |
+
+environment:実行環境に合わせた設定を行います。使用しない環境変数は'keyごと削除'してください。
+
+メール設定の詳細は、http://redmine.jp/faq/general/mail_notification/ を参照してください。
 
 
-## Install
+| key                 | value                                                                                                          |
+|:--------------------|:---------------------------------------------------------------------------------------------------------------|
+| USER                | 追加したいユーザがいる場合ユーザIDを指定します。                                                               |
+| USER_PASSWORD       | 上記ユーザのパスワードを指定します。                                                                           |
+| ROOT_PASSWORD       | rootのパスワードを指定します。デフォルトは rootpw です。                                                       |
+| REDMINE_HOST        | Redmineの管理 > 設定 > 全般 の「ホスト名とパス」を指定します。メールを送信する際に、メール本文に記載されます。 |
+| SMTP_ENABLE         | Redmineがメールを送信する場合は、 y を指定してください。                                                       |
+| SMTP_METHOD         | Redmineがメールを送信する場合は、 smtp を指定してください。                                                    |
+| SMTP_STARTTLS       | SMTPがTLSを使用する場合は、trueを指定し、使用しない場合は、keyごと削除してください。                           |
+| SMTP_HOST           | SMTPのホストアドレスを指定してください。                                                                       |
+| SMTP_PORT           | SMTPのポート番号を指定してください。                                                                           |
+| SMTP_DOMAIN         | SMTPのドメインを指定してください。                                                                             |
+| SMTP_AUTHENTICATION | SMTPの認証方式を指定してください。                                                                             |
+| SMTP_USER           | SMTPの認証ユーザを指定してください。                                                                           |
+| SMTP_PASS           | SMTPの認証パスワードを指定してください。                                                                       |
+
 
 ## Contribution
+
 
 ## Licence
 

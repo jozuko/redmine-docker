@@ -485,7 +485,105 @@ RUN mkdir -p /var/lib/jenkins/plugins; \
     java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ restart
 
 
+
 ########################################  after-setting  ########################################
+
+# svn auth
+RUN mkdir -p /etc/httpd/Apache/Authn; \
+    cp ${INSTALL_DIR}/extra/svn/Redmine.pm /etc/httpd/Apache/Authn/
+
+# edit /etc/httpd/conf.d/redmine.conf
+RUN echo 'LoadModule passenger_module /usr/local/lib/ruby/gems/2.2.0/gems/passenger-5.0.25/buildout/apache2/mod_passenger.so'   > /etc/httpd/conf.d/redmine.conf; \
+    echo 'PassengerRoot /usr/local/lib/ruby/gems/2.2.0/gems/passenger-5.0.25'                                                  >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'PassengerRuby /usr/local/bin/ruby'                                                                                   >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '<VirtualHost *:80>'                                                                                                  >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ServerName :80'                                                                                                      >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'DocumentRoot /opt/redmine/public'                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresActive On'                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresByType application/x-javascript A259200'                                                                      >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresByType application/javascript A259200'                                                                        >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresByType image/png A2592000'                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresByType image/jpeg A2592000'                                                                                   >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresByType image/gif A2592000'                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'ExpiresByType text/css A2592000'                                                                                     >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '#RewriteEngine On'                                                                                                   >> /etc/httpd/conf.d/redmine.conf; \
+    echo '#RewriteCond %{SERVER_PORT} 80'                                                                                      >> /etc/httpd/conf.d/redmine.conf; \
+    echo '#RewriteCond %{SERVER_NAME} !localhost'                                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '#RewriteRule ^(.*)?$ https://%{HTTP_HOST}$1 [R,L]'                                                                   >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '</VirtualHost>'                                                                                                      >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'Alias /plugin_assets /opt/redmine/public/plugin_assets'                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '<Directory /opt/redmine/public/plugin_assets>'                                                                       >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  Allow from all'                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  PassengerEnabled off'                                                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '</Directory>'                                                                                                        >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'Alias /stylesheets /opt/redmine/public/stylesheets'                                                                  >> /etc/httpd/conf.d/redmine.conf; \
+    echo '<Directory /opt/redmine/public/stylesheets>'                                                                         >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  Allow from all'                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  PassengerEnabled off'                                                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '</Directory>'                                                                                                        >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'Alias /javascripts /opt/redmine/public/javascripts'                                                                  >> /etc/httpd/conf.d/redmine.conf; \
+    echo '<Directory /opt/redmine/public/javascritps>'                                                                         >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  Allow from all'                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  PassengerEnabled off'                                                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '</Directory>'                                                                                                        >> /etc/httpd/conf.d/redmine.conf; \
+    echo ''                                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo 'Alias /images /opt/redmine/public/images'                                                                            >> /etc/httpd/conf.d/redmine.conf; \
+    echo '<Directory /opt/redmine/public/images>'                                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  Allow from all'                                                                                                    >> /etc/httpd/conf.d/redmine.conf; \
+    echo '  PassengerEnabled off'                                                                                              >> /etc/httpd/conf.d/redmine.conf; \
+    echo '</Directory>'                                                                                                        >> /etc/httpd/conf.d/redmine.conf
+
+
+# edit /etc/httpd/conf.d/vcs.conf
+RUN echo '# Subversionの設定'                                            > /etc/httpd/conf.d/vcs.conf; \
+    echo 'PerlLoadModule Apache::Authn::Redmine'                        >> /etc/httpd/conf.d/vcs.conf; \
+    echo '<Location /svn/>'                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    PerlAccessHandler Apache::Authn::Redmine::access_handler' >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    PerlAuthenHandler Apache::Authn::Redmine::authen_handler' >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    DAV svn'                                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    SVNParentPath /var/opt/redmine/svn'                       >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    SVNListParentPath on'                                     >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    AuthzSVNAccessFile /etc/opt/redmine/svnauthz'             >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    AuthType Basic'                                           >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    AuthName Subversion'                                      >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '# for Redmine Authentication'                                 >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineDSN "DBI:mysql:database=redmine;host=localhost"'   >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineDbUser "redmine"'                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineDbPass "redmine"'                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    Require valid-user'                                       >> /etc/httpd/conf.d/vcs.conf; \
+    echo '</Location>'                                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '# Gitの設定'                                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo 'SetEnv GIT_PROJECT_ROOT /var/opt/redmine/git'                 >> /etc/httpd/conf.d/vcs.conf; \
+    echo 'SetEnv GIT_HTTP_EXPORT_ALL'                                   >> /etc/httpd/conf.d/vcs.conf; \
+    echo 'ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/'    >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '<Location /git/>'                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    PerlAccessHandler Apache::Authn::Redmine::access_handler' >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    PerlAuthenHandler Apache::Authn::Redmine::authen_handler' >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    AuthType Basic'                                           >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    AuthName Git'                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '# for Redmine Authentication'                                 >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineDSN "DBI:mysql:database=redmine;host=localhost"'   >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineDbUser "redmine"'                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineDbPass "redmine"'                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    RedmineGitSmartHttp yes'                                  >> /etc/httpd/conf.d/vcs.conf; \
+    echo ''                                                             >> /etc/httpd/conf.d/vcs.conf; \
+    echo '    Require valid-user'                                       >> /etc/httpd/conf.d/vcs.conf; \
+    echo '</Location>'                                                  >> /etc/httpd/conf.d/vcs.conf
 
 
 CMD ["/bin/bash"]
