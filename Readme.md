@@ -38,6 +38,7 @@ docker-compose.ymlを作りましたので、それを元に使い方を説明�
 > git clone https://github.com/jozuko/redmine-docker.git
 
 2. redmine-dockerにdocker-compose.ymlが含まれていますので、自分の環境に合わせて編集します。
+
 > redmine:
 >     image: jozuko/redmine-docker:redmine3.2
 >
@@ -54,7 +55,7 @@ docker-compose.ymlを作りましたので、それを元に使い方を説明�
 >         - USER=jozuko2
 >         - USER_PASSWORD=jozuko2
 >         - ROOT_PASSWORD=rootpw
-
+>
 >         - REDMINE_HOST=localhost:10180
 >
 >         - SMTP_ENABLE=n
@@ -104,6 +105,8 @@ environment:実行環境に合わせた設定を行います。使用しない�
 | SMTP_USER           | SMTPの認証ユーザを指定してください。                                                                           |
 | SMTP_PASS           | SMTPの認証パスワードを指定してください。                                                                       |
 
+
+restart: dockerサービス起動時に自動でリスターとさせる場合、alwaysを指定します。
 
 ## Contribution
 

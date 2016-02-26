@@ -11,22 +11,20 @@ redmine:
         - "./volumes/repos/:/var/opt/redmine/"
 
     environment:
+        - USER=jozuko2
+        - USER_PASSWORD=jozuko2
+        - ROOT_PASSWORD=rootpw
+
         - REDMINE_HOST=localhost:10180
 
-# add user if you want
-#        - USER=jozuko2
-#        - USER_PASSWORD=jozuko2
-#        - ROOT_PASSWORD=rootpw
-
-# redmine smtp settngs
         - SMTP_ENABLE=n
-#       - SMTP_METHOD=smtp
-#       - SMTP_STARTTLS=true
-#       - SMTP_HOST=smtp.gmail.com
-#       - SMTP_PORT=587
-#       - SMTP_DOMAIN=smtp.gmail.com
-#       - SMTP_AUTHENTICATION=plain
-#       - SMTP_USER=user.name@gmail.com
-#       - SMTP_PASS=gmail-password
+        - SMTP_METHOD=smtp
+        - SMTP_STARTTLS=true
+        - SMTP_HOST=smtp.gmail.com
+        - SMTP_PORT=587
+        - SMTP_DOMAIN=smtp.gmail.com
+        - SMTP_AUTHENTICATION=plain
+        - SMTP_USER=user.name@gmail.com
+        - SMTP_PASS=gmail-password
 
-#    restart: always
+    restart: always
