@@ -292,7 +292,7 @@ RUN sed -i 's/JENKINS_ARGS=""/JENKINS_ARGS="--prefix=\/jenkins"/' /etc/sysconfig
 RUN mkdir -p /var/lib/jenkins/plugins; \
     chown jenkins.jenkins /var/lib/jenkins/plugins; \
     service jenkins start; \
-    sleep 30; \
+    sleep 60; \
     wget -O $INSTALL_DIR/bin/jenkins-cli.jar http://localhost:8080/jenkins/jnlpJars/jenkins-cli.jar; \
     curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack; \
     java -jar $INSTALL_DIR/bin/jenkins-cli.jar -s http://localhost:8080/jenkins/ install-plugin reverse-proxy-auth-plugin; \
