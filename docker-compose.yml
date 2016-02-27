@@ -1,5 +1,5 @@
 redmine:
-    image: jozuko/redmine-docker:redmine3.2
+    image: jozuko/centos-redmine-jenkins-git:redmine3.2
 
     ports:
         - "10122:22"
