@@ -1,8 +1,8 @@
 CentOS 6.7 + redmine 3.2 + jenkins + git + svn on docker
 ====
 
-Redmie環境全部入りのイメージです。でもまだメンテナンス中です。DockerのAutoBuildがfailします...。（2016/02/29完成目標）  
-This is an all-in-one image of Redmine.  
+Redmie環境全部入り(CentOS 6.7 + redmine 3.2 + jenkins + git + svn)のイメージです。
+This is an all-in-one(CentOS 6.7 + redmine 3.2 + jenkins + git + svn) image of Redmine.  
 
 ## Many thanks.
 
