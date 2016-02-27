@@ -2,7 +2,7 @@ redmine:
     image: jozuko/redmine-docker:redmine3.2
 
     ports:
-        - "10022:22"
+        - "10122:22"
         - "10180:80"
 
     volumes:
@@ -11,9 +11,12 @@ redmine:
         - "./volumes/repos/:/var/opt/redmine/"
 
     environment:
-        - USER=jozuko2
-        - USER_PASSWORD=jozuko2
+        - USER=jozuko
+        - USER_PASSWORD=jozuko
         - ROOT_PASSWORD=rootpw
+
+        - LOCALTIME=Japan
+        - TIMEZONE=Asia/Tokyo
 
         - REDMINE_HOST=localhost:10180
 

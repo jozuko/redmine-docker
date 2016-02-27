@@ -1,0 +1,3 @@
+#!/bin/sh
+
+%INSTALL_DIR%/bin/sync-scm $@

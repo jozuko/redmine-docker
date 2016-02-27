@@ -1,0 +1,2 @@
+CREATE DATABASE redmine DEFAULT CHARACTER SET utf8;
+GRANT ALL PRIVILEGES ON redmine.* TO redmine@localhost IDENTIFIED BY 'redmine';
