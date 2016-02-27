@@ -1,29 +1,26 @@
 CentOS 6.7 + redmine 3.2 + jenkins + git + svn on docker
 ====
 
-Redmie環境全部入りのイメージです。でもまだメンテナンス中です。DockerのAutoBuildがfailします...。（2016/02/29完成目標）
-This is an all-in-one image of Redmine.
+Redmie環境全部入りのイメージです。でもまだメンテナンス中です。DockerのAutoBuildがfailします...。（2016/02/29完成目標）  
+This is an all-in-one image of Redmine.  
 
 ## Many thanks.
 
-このイメージを作るきっかけとなったalminiumの作成者の方々、データの初期展開方法を載せてくださっているayapapaさん、その他先達の方々皆様に感謝です。
-People of the creator of alminium became a chance to make this image, ayapapa that who put the initial deployment method of data, the people everyone of other predecessors, I am very grateful.
-
-[alminium](https://github.com/alminium/alminium)
-[ayapapaさん docker-alminium](https://hub.docker.com/r/ayapapa/docker-alminium/)
+このイメージを作るきっかけとなったalminiumの作成者の方々、データの初期展開方法を載せてくださっているayapapaさん、その他先達の方々皆様に感謝です。  
+People of the creator of alminium became a chance to make this image, ayapapa that who put the initial deployment method of data, the people everyone of other predecessors, I am very grateful.  
+  
+[alminium](https://github.com/alminium/alminium)  
+[ayapapaさん docker-alminium](https://hub.docker.com/r/ayapapa/docker-alminium/)  
 
 
 ## Description
 
 ### アクセスURL - Access URL
 
-Redmine：http://<host-address>:<port>/
-
-Jenkins：http://<host-address>:<port>/jenkins/
-
-git    ：http://<host-address>:<port>/git/
-
-svn    ：http://<host-address>:<port>/svn/
+Redmine：http://<host-address>:<port>/  
+Jenkins：http://<host-address>:<port>/jenkins/  
+git    ：http://<host-address>:<port>/git/  
+svn    ：http://<host-address>:<port>/svn/  
 
 ### Redmieプラグイン一覧 - List of Plugins for Redmine
 
@@ -42,15 +39,15 @@ svn    ：http://<host-address>:<port>/svn/
 
 ## インストールと使い方 - Install & Usage
 
-docker-compose.ymlを作りましたので、それを元に使い方を説明します。
-Since I made a docker-compose.yml, it describes how to use based on it.
-
-1. Redmineのコンテナを作成するディレクトリで、https://github.com/jozuko/redmine-docker.git をcloneします。
-   In the directory in which you want to create a Redmine of container, https: the //github.com/jozuko/redmine-docker.git to "clone".
+docker-compose.ymlを作りましたので、それを元に使い方を説明します。  
+Since I made a docker-compose.yml, it describes how to use based on it.  
+  
+1. Redmineのコンテナを作成するディレクトリで、https://github.com/jozuko/redmine-docker.git をcloneします。  
+   In the directory in which you want to create a Redmine of container, https: the //github.com/jozuko/redmine-docker.git to "clone".  
 > git clone https://github.com/jozuko/redmine-docker.git
 
-2. redmine-dockerにdocker-compose.ymlが含まれていますので、自分の環境に合わせて編集します。
-   Since it contains a docker-compose.yml to redmine-docker, and edit it to suit your environment.
+2. redmine-dockerにdocker-compose.ymlが含まれていますので、自分の環境に合わせて編集します。  
+   Since it contains a docker-compose.yml to redmine-docker, and edit it to suit your environment.  
 > redmine:
 >     image: jozuko/redmine-docker:redmine3.2
 >
@@ -85,21 +82,21 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 >
 >     restart: always
 
-**image:**
-　　変更しないでください。
-　　Please do not change.
+**image:**  
+　　変更しないでください。  
+　　Please do not change.  
 
-**ports:**
-　　22ポート(SSH)と80ポート(Redmine)をホストOSのポートに割り当てます。
-　　上記の記載だと、http://<host-address>:10180/でredmineが起動します。
-　　Assign the 22 port (SSH) and 80 port (Redmine) to a port on the host OS.
-　　That's the above description, "http://<host-address>:10180/" redmine will start in.
+**ports:**  
+　　22ポート(SSH)と80ポート(Redmine)をホストOSのポートに割り当てます。  
+　　上記の記載だと、http://<host-address>:10180/でredmineが起動します。  
+　　Assign the 22 port (SSH) and 80 port (Redmine) to a port on the host OS.  
+　　That's the above description, "http://<host-address>:10180/" redmine will start in.  
 
-**volumes:**
-　　redmineとmysqlのデータを保存するホストのディレクトリを指定します。
-　　上記の記載だと、以下のようになります。
-　　Specify the redmine and mysql directory of the host where you want to save the data.
-　　That's the above description, is as follows.
+**volumes:**  
+　　redmineとmysqlのデータを保存するホストのディレクトリを指定します。  
+　　上記の記載だと、以下のようになります。  
+　　Specify the redmine and mysql directory of the host where you want to save the data.  
+　　That's the above description, is as follows.  
 
 | Contents                                                                           | The path of the host directory                                                                                      |
 |:-----------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------|
@@ -107,11 +104,11 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 | Redmineの情報を含むMySQLのデータ <br> MySQL data, including Redmine of information | <docker-compose.ymlがあるディレクトリ>/volumes/mysql/ <br> <Directory there is a docker-compose.yml>/volumes/mysql/ |
 | git / svnリポジトリデータ <br> git / svn repository data                           | <docker-compose.ymlがあるディレクトリ>/volumes/repos/ <br> <Directory there is a docker-compose.yml>/volumes/repos/ |
 
-**environment:**
-　　実行環境に合わせた設定を行います。使用しないkeyは、valueをブランクにしてください。
-　　Redmineのメール設定は、http://redmine.jp/faq/general/mail_notification/ を参照してください。
-　　Configure the settings to match the execution environment. key is not used, please refer to the value in the blank.
-　　Redmine e-mail settings, http: Please refer to the http://redmine.jp/faq/general/mail_notification/ .
+**environment:**  
+　　実行環境に合わせた設定を行います。使用しないkeyは、valueをブランクにしてください。  
+　　Redmineのメール設定は、http://redmine.jp/faq/general/mail_notification/ を参照してください。  
+　　Configure the settings to match the execution environment. key is not used, please refer to the value in the blank.  
+　　Redmine e-mail settings, http: Please refer to the http://redmine.jp/faq/general/mail_notification/ .  
 
 | Category | key                 | value                                                                                                                                                                                                                                                                                   |
 |:---------|:--------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -132,11 +129,11 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 | Redmine  | SMTP_PASS           | SMTPの認証パスワードを指定してください。                                                                                       <br> Please specify the SMTP authentication password.                                                                                                    |
 
 
-**restart:**
-　　dockerサービス起動時に自動でリスターとさせる場合、alwaysを指定します。
-　　不要な場合は削除してください。
-　　If you want to with the Lister automatically to docker service starts, you can use the always.
-　　Please delete if not required.
+**restart:**  
+　　dockerサービス起動時に自動でリスターとさせる場合、alwaysを指定します。  
+　　不要な場合は削除してください。  
+　　If you want to with the Lister automatically to docker service starts, you can use the always.  
+　　Please delete if not required.  
 
 
 ## Licence
