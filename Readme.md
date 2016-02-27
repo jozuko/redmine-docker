@@ -51,7 +51,7 @@ Since I made a docker-compose.yml, it describes how to use based on it.
    
 ```docker-compose.yml
 redmine:
-    image: jozuko/redmine-docker:redmine3.2
+    image: jozuko/centos-redmine-jenkins-git:redmine3.2
 
     ports:
         - "10122:22"
