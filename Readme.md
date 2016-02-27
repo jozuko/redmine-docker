@@ -48,39 +48,42 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 
 2. redmine-dockerにdocker-compose.ymlが含まれていますので、自分の環境に合わせて編集します。  
    Since it contains a docker-compose.yml to redmine-docker, and edit it to suit your environment.  
-> redmine:
->     image: jozuko/redmine-docker:redmine3.2
->
->     ports:
->         - "10122:22"
->         - "10180:80"
->
->     volumes:
->         - "./volumes/files/:/opt/redmine/files/"
->         - "./volumes/mysql/:/var/lib/mysql/"
->         - "./volumes/repos/:/var/opt/redmine/"
->
->     environment:
->         - USER=jozuko
->         - USER_PASSWORD=jozuko
->         - ROOT_PASSWORD=rootpw
->
->         - LOCALTIME=Japan
->         - TIMEZONE=Asia/Tokyo
->
->         - REDMINE_HOST=localhost:10180
->
->         - SMTP_ENABLE=n
->         - SMTP_METHOD=smtp
->         - SMTP_STARTTLS=true
->         - SMTP_HOST=smtp.gmail.com
->         - SMTP_PORT=587
->         - SMTP_DOMAIN=smtp.gmail.com
->         - SMTP_AUTHENTICATION=plain
->         - SMTP_USER=user.name@gmail.com
->         - SMTP_PASS=gmail-password
->
->     restart: always
+   
+```redmine-docker/docker-compose.yml
+redmine:
+    image: jozuko/redmine-docker:redmine3.2
+
+    ports:
+        - "10122:22"
+        - "10180:80"
+
+    volumes:
+        - "./volumes/files/:/opt/redmine/files/"
+        - "./volumes/mysql/:/var/lib/mysql/"
+        - "./volumes/repos/:/var/opt/redmine/"
+
+    environment:
+        - USER=jozuko
+        - USER_PASSWORD=jozuko
+        - ROOT_PASSWORD=rootpw
+
+        - LOCALTIME=Japan
+        - TIMEZONE=Asia/Tokyo
+
+        - REDMINE_HOST=localhost:10180
+
+        - SMTP_ENABLE=n
+        - SMTP_METHOD=smtp
+        - SMTP_STARTTLS=true
+        - SMTP_HOST=smtp.gmail.com
+        - SMTP_PORT=587
+        - SMTP_DOMAIN=smtp.gmail.com
+        - SMTP_AUTHENTICATION=plain
+        - SMTP_USER=user.name@gmail.com
+        - SMTP_PASS=gmail-password
+
+    restart: always
+```
 
 **image:**  
 　　変更しないでください。  
