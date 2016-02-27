@@ -17,10 +17,10 @@ People of the creator of alminium became a chance to make this image, ayapapa th
 
 ### アクセスURL - Access URL
 
-Redmine：http://<host-address>:<port>/  
-Jenkins：http://<host-address>:<port>/jenkins/  
-git    ：http://<host-address>:<port>/git/  
-svn    ：http://<host-address>:<port>/svn/  
+Redmine：http://&lt;host-address&gt;:&lt;port&gt;/  
+Jenkins：http://&lt;host-address&gt;:&lt;port&gt;/jenkins/  
+git    ：http://&lt;host-address&gt;:&lt;port&gt;/git/  
+svn    ：http://&lt;host-address&gt;:&lt;port&gt;/svn/  
 
 ### Redmieプラグイン一覧 - List of Plugins for Redmine
 
@@ -37,7 +37,7 @@ svn    ：http://<host-address>:<port>/svn/
 
 ## Demo
 
-## インストールと使い方 - Install & Usage
+## インストールと使い方 - Install &amp; Usage
 
 docker-compose.ymlを作りましたので、それを元に使い方を説明します。  
 Since I made a docker-compose.yml, it describes how to use based on it.  
@@ -88,9 +88,9 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 
 **ports:**  
 　　22ポート(SSH)と80ポート(Redmine)をホストOSのポートに割り当てます。  
-　　上記の記載だと、http://<host-address>:10180/でredmineが起動します。  
+　　上記の記載だと、http://&lt;host-address&gt;:10180/でredmineが起動します。  
 　　Assign the 22 port (SSH) and 80 port (Redmine) to a port on the host OS.  
-　　That's the above description, "http://<host-address>:10180/" redmine will start in.  
+　　That's the above description, "http://&lt;host-address&gt;:10180/" redmine will start in.  
 
 **volumes:**  
 　　redmineとmysqlのデータを保存するホストのディレクトリを指定します。  
@@ -98,11 +98,11 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 　　Specify the redmine and mysql directory of the host where you want to save the data.  
 　　That's the above description, is as follows.  
 
-| Contents                                                                           | The path of the host directory                                                                                      |
-|:-----------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------|
-| Redmineのattachmentファイル <br> Redmine attachments file                          | <docker-compose.ymlがあるディレクトリ>/volumes/files/ <br> <Directory there is a docker-compose.yml>/volumes/files/ |
-| Redmineの情報を含むMySQLのデータ <br> MySQL data, including Redmine of information | <docker-compose.ymlがあるディレクトリ>/volumes/mysql/ <br> <Directory there is a docker-compose.yml>/volumes/mysql/ |
-| git / svnリポジトリデータ <br> git / svn repository data                           | <docker-compose.ymlがあるディレクトリ>/volumes/repos/ <br> <Directory there is a docker-compose.yml>/volumes/repos/ |
+| Contents                                                                           | The path of the host directory                                                                                                  |
+|:-----------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------|
+| Redmineのattachmentファイル <br> Redmine attachments file                          | &lt;docker-compose.ymlがあるディレクトリ&gt;/volumes/files/ <br> &lt;Directory there is a docker-compose.yml&gt;/volumes/files/ |
+| Redmineの情報を含むMySQLのデータ <br> MySQL data, including Redmine of information | &lt;docker-compose.ymlがあるディレクトリ&gt;/volumes/mysql/ <br> &lt;Directory there is a docker-compose.yml&gt;/volumes/mysql/ |
+| git / svnリポジトリデータ <br> git / svn repository data                           | &lt;docker-compose.ymlがあるディレクトリ&gt;/volumes/repos/ <br> &lt;Directory there is a docker-compose.yml&gt;/volumes/repos/ |
 
 **environment:**  
 　　実行環境に合わせた設定を行います。使用しないkeyは、valueをブランクにしてください。  
@@ -117,7 +117,7 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 | OS       | ROOT_PASSWORD       | rootのパスワードを指定します。デフォルトは rootpw です。                                                                       <br> Specify the root password. The default is rootpw.                                                                                                   |
 | TimeZone | LOCALTIME           | /etc/localtimeにコピーするlocaltimeを指定します。/usr/share/zoneinfo/以下のディレクトリを指定してください。日本ならJapanです。 <br> It specifies the localtime to copy it to /etc/localtime. Please specify the directory under the "/usr/share/zoneinfo/". If London is Europe/London. |
 | TimeZone | TIMEZONE            | タイムゾーンを指定します。日本ならAsia/Tokyo、ロンドンならEurope/Londonです。                                                  <br> Specify the time zone. If London is Europe/London.                                                                                                  |
-| Redmine  | REDMINE_HOST        | 管理 > 設定 > 全般 の「ホスト名とパス」を指定します。メールを送信する際に、メール本文に記載されます。                          <br> Management> Settings> Specifies the "host name and path" General. When you send an e-mail, it will be included in the email body.                   |
+| Redmine  | REDMINE_HOST        | 管理 &gt; 設定 &gt; 全般 の「ホスト名とパス」を指定します。メールを送信する際に、メール本文に記載されます。                    <br> Management&gt; Settings&gt; Specifies the "host name and path" General. When you send an e-mail, it will be included in the email body.             |
 | Redmine  | SMTP_ENABLE         | Redmineからメールを送信する場合は、 y を指定してください。                                                                     <br> If you want to send mail from Redmine, please specify the y.                                                                                        |
 | Redmine  | SMTP_METHOD         | Redmineからメールを送信する場合は、 smtp を指定してください。                                                                  <br> If you want to send mail from Redmine, please specify the smtp.                                                                                     |
 | Redmine  | SMTP_STARTTLS       | SMTPがTLSを使用する場合は、trueを指定してください。                                                                            <br> If SMTP is using TLS, please specify the true.                                                                                                      |
