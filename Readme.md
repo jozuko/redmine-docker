@@ -49,7 +49,7 @@ Since I made a docker-compose.yml, it describes how to use based on it.
 2. redmine-dockerにdocker-compose.ymlが含まれていますので、自分の環境に合わせて編集します。  
    Since it contains a docker-compose.yml to redmine-docker, and edit it to suit your environment.  
    
-```redmine-docker/docker-compose.yml
+```docker-compose.yml
 redmine:
     image: jozuko/redmine-docker:redmine3.2
 
