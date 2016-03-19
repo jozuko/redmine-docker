@@ -200,13 +200,6 @@ RUN cd /usr/local/src; \
     mv redmine_code_review ${INSTALL_DIR}/plugins/redmine_code_review; \
     rm -f redmine-plugins/redmine_code_review-0.7.0.zip
 
-# advanced_roadmap(ロードマップを表示するプラグイン)
-RUN cd /usr/local/src; \
-    wget --no-check-certificate -P redmine-plugins https://redmine.ociotec.com/attachments/download/332/advanced_roadmap%20v0.9.0.tar.gz; \
-    tar zxf "redmine-plugins/advanced_roadmap v0.9.0.tar.gz"; \
-    mv "advanced_roadmap v0.9.0" ${INSTALL_DIR}/plugins/advanced_roadmap; \
-    rm -f "redmine-plugins/advanced_roadmap v0.9.0.tar.gz"
-
 # scm-creator（redmine上でリポジトリを作成するプラグイン）
 RUN cd /usr/local/src; \
     svn export -r 142 http://subversion.andriylesyuk.com/scm-creator redmine_scm; \
@@ -220,6 +213,9 @@ RUN git clone https://github.com/peclik/clipboard_image_paste.git ${INSTALL_DIR}
 
 # redmine_banner(Redmineのサイト上部に管理者からのメッセージを表示できる)
 RUN git clone https://github.com/akiko-pusu/redmine_banner.git ${INSTALL_DIR}/plugins/redmine_banner
+
+# jozu_gantt(ガントチャートプラグイン)
+RUN git clone https://github.com/jozuko/jozu_gantt.git ${INSTALL_DIR}/plugins/jozu_gantt
 
 # update database
 RUN /etc/init.d/mysqld start; \
