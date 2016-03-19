@@ -29,7 +29,7 @@ svn    ：http://&lt;host-address&gt;:&lt;port&gt;/svn/
 | redmine_xls_export             | チケットをExcelにエクスポート <br> Export a ticket to Excel                                                                         |
 | redmine_plugin_views_revisions | redmine_xls_exportに必要なplugin <br> plugin necessary to redmine_xls_export                                                        |
 | redmine_code_review            | リポジトリのdiffに対してコメントを書ける <br> Plug-in to write a comment to the repository of the diff                              |
-| advanced_roadmap               | ロードマップを表示するプラグイン <br> Plug-in to view the road map                                                                  |
+| jozu_gantt                     | ガントチャートプラグイン <br> Plug-in to gantt                                                                                      |
 | scm-creator                    | Redmine上でリモートリポジトリを作成するプラグイン <br> Plug-in to create a remote repository on Redmine                             |
 | redmine_drafts                 | 作成中のチケットを保存 <br> Save the ticket being created                                                                           |
 | clipboard_image_paste          | チケットにイメージをコピペできる <br> You can copy and paste the image to the ticket                                                |
